@@ -129,6 +129,38 @@ Desktop.ini
 *.csproj.user
 *.sln.docstates
 
+### C++
+# Object files
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Static libraries
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+
+# Linker output
+*.ilk
+*.map
+*.exp
+
+# Debug files
+*.dSYM/
+*.idb
+*.pdb
+
 Assets/Scenes/SampleScene.unity
 Assets/Scenes/SampleScene.unity.meta
 .vsconfig
