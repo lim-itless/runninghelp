@@ -1,87 +1,115 @@
 ﻿#include <iostream>
 
-int main()
+void PracticeWhile()
+{
+    int number = 0;
+
+    std::cout << "정수를 입력하세요. (-10~10) : ";
+
+    if (!(std::cin >> number))
+    {
+        return;
+    }
+
+    if (number < -10 || number > 10)
+    {
+        return;
+    }
+
+    while (number >= -15)
+    {
+        std::cout << number << '\n';
+        number -= 5;
+    }
+}
+
+void PracticeDoWhile()
 {
     int first = 0;
     int second = 0;
 
-    std::cout << "정수 두 개를 입력하세요 : ";
-    std::cin >> first >> second;
+    std::cout << "두 정수를 입력하세요: ";
 
-    std::cout << "덧셈 : " << first + second << '\n';
-    std::cout << "뺄셈 : " << first - second << '\n';
-    std::cout << "곱셈 : " << first * second << '\n';
-
-    if (second != 0)
+    if (!(std::cin >> first >> second))
     {
-        std::cout << "나눗셈 : " << first / second << '\n';
-        std::cout << "나머지 : " << first % second << '\n';
-    }
-    else
-    {
-        std::cout << "0 으로 나누거나 나머지를 구할 수 없음.\n";
+        return;
     }
 
-    int num1 = 0;
-    int num2 = 0;
-    int num3 = 0;
+    int minNum = first;
+    int maxNum = second;
 
-    std::cout << "정수 세 개를 입력하세요 : ";
-    std::cin >> num1 >> num2 >> num3;
-
-    if (num1 != 0)
+    if (minNum > maxNum)
     {
-        int result1 = (num1 + num2) * (num3 + num1) % num1;
-
-        std::cout << "(num1 + num2) * (num3 + num1) % num1 = " << result1 << '\n';
-    }
-    else
-    {
-        std::cout << "첫 번째 수식 : num1 = 0 은 계산할 수 없음.\n";
+        int temp = minNum;
+        minNum = maxNum;
+        maxNum = temp;
     }
 
-    if (num2 != 0)
+    long long current = minNum;
+    long long count = 0;
+    long long sum = 0;
+
+    do
     {
-        int result2 = (num3 % num2) + (num1 * 2);
+        if (current % 3 == 0)
+        {
+            if (count > 0)
+            {
+                std::cout << ", ";
+            }
 
-        std::cout << "(num3 % num2) + (num1 * 2) = " << result2 << '\n';
+            std::cout << current;
+            ++count;
+            sum += current;
+        }
+
+        ++current;
     }
-    else
+    while (current <= maxNum);
+
+    if (count == 0)
     {
-        std::cout << "두 번째 수식 : num2 = 0 은 계산할 수 없음.\n";
+        std::cout << "범위 안에 3의 배수 없음.";
     }
 
-    if (num3 != -1)
+    std::cout << "\n총 개수 : " << count << '\n';
+    std::cout << "합 : " << sum << '\n';
+}
+
+void PracticeFor()
+{
+    int dan = 0;
+
+    std::cout << "단을 입력하세요.(2~9) : ";
+
+    if (!(std::cin >> dan))
     {
-        int result3 = (num1 + num2 + num3) % (num3 + 1);
-
-        std::cout << "(num1 + num2 + num3) % (num3 + 1) = " << result3 << '\n';
+        return;
     }
-    else
+
+    if (dan < 2 || dan > 9)
     {
-        std::cout << "세 번째 수식 : num3 + 1 = 0 은 계산할 수 없음.\n";
+        return;
     }
 
-    int a = 0;
-    int b = 0;
+    int sum = 0;
 
-    std::cout << "a와 b를 입력하세요 (a >= 0, b > 0) : ";
-    std::cin >> a >> b;
-
-    if (a >= 0 && b > 0)
+    for (int i = 1; i <= 9; ++i)
     {
-        int q = a / b;
-        int r = a % b;
-        int restoredA = b * q + r;
+        int result = dan * i;
+        sum += result;
 
-        std::cout << "몫 : " << q << ", 나머지 : " << r << '\n';
-        std::cout << "원래 숫자 a : " << a << '\n';
-        std::cout << "계산된 값 : " << restoredA << '\n';
+        std::cout << dan << " x " << i << " = " << result << '\n';
     }
-    else
-    {
-        std::cout << "a는 0 이상, b는 양수로 입력해주세요.\n";
-    }
+
+    std::cout << "곱셈의 합 : " << sum << '\n';
+}
+
+int main()
+{
+    PracticeWhile();
+    PracticeDoWhile();
+    PracticeFor();
 
     return 0;
 }
