@@ -6,150 +6,161 @@ class Program
     {
         Random random = new Random();
 
-        while (true)
+        int playerHp = 100;
+        int monsterHp = 200;
+        int turn = 1;
+
+        bool isInvincible = false;
+        bool isCharging = false;
+
+        string[] playerSkills = { "일반 공격", "베기", "찌르기", "내려찍기" };
+
+        int[] playerDamage = { 10, 50, 30, 70 };
+
+        string[] monsterSkills = { "일반 공격", "기 모으기" };
+
+        Console.WriteLine("===== 턴제 미니 RPG =====");
+        Console.WriteLine("[치트] god - 무적 전환 / kill - 몬스터 즉사");
+
+        while (playerHp > 0 && monsterHp > 0)
         {
-            int[] answer = new int[3];
+            Console.WriteLine($"\n===== {turn}턴 =====");
+            Console.WriteLine($"플레이어 HP : {playerHp} / 100");
+            Console.WriteLine($"몬스터 HP : {monsterHp} / 200");
 
-            for (int i = 0; i < answer.Length; i++)
+            if (isInvincible)
             {
-                answer[i] = random.Next(0, 10);
-
-                for (int j = 0; j < i; j++)
-                {
-                    if (answer[i] == answer[j])
-                    {
-                        i--;
-                        break;
-                    }
-                }
+                Console.WriteLine("[무적 상태]");
             }
 
-            int attempts = 0;
-
-            Console.WriteLine("\n===== 숫자 야구 =====");
-            Console.WriteLine("중복 없는 숫자 3개를 공백으로 구분해 입력하세요.");
-            Console.WriteLine("입력 예시 : 3 6 9");
-
-            while (true)
+            if (isCharging)
             {
-                Console.Write("\n숫자 3개 입력 (치트 - cheat 입력) : ");
-                string input = Console.ReadLine() ?? "";
-
-                if (input.Trim().ToLower() == "cheat")
-                {
-                    Console.WriteLine($"[치트] 컴퓨터 숫자 : {answer[0]} {answer[1]} {answer[2]}");
-                    continue;
-                }
-
-                string[] parts = input.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-                if (parts.Length != 3)
-                {
-                    Console.WriteLine("숫자 3개를 공백으로 구분해 입력해주세요.");
-                    continue;
-                }
-
-                int[] num = new int[3];
-                bool validInput = true;
-
-                for (int i = 0; i < num.Length; i++)
-                {
-                    if (!int.TryParse(parts[i], out num[i]))
-                    {
-                        validInput = false;
-                        break;
-                    }
-
-                    if (num[i] < 0 || num[i] > 9)
-                    {
-                        validInput = false;
-                        break;
-                    }
-                }
-
-                if (!validInput)
-                {
-                    Console.WriteLine("각 숫자는 0~9 사이의 정수여야 합니다.");
-                    continue;
-                }
-
-                if (num[0] == num[1] || num[0] == num[2] || num[1] == num[2])
-                {
-                    Console.WriteLine("중복 없이 입력해주세요.");
-                    continue;
-                }
-
-                attempts++;
-
-                int strike = 0;
-                int ball = 0;
-                int outCount = 0;
-
-                for (int i = 0; i < num.Length; i++)
-                {
-                    bool found = false;
-
-                    for (int j = 0; j < answer.Length; j++)
-                    {
-                        if (num[i] == answer[j])
-                        {
-                            found = true;
-
-                            if (i == j)
-                            {
-                                strike++;
-                            }
-                            else
-                            {
-                                ball++;
-                            }
-
-                            break;
-                        }
-                    }
-
-                    if (!found)
-                    {
-                        outCount++;
-                    }
-                }
-
-                Console.WriteLine($"{strike} S / {ball} B / {outCount} O");
-
-                if (strike == 3)
-                {
-                    Console.WriteLine($"정답입니다! {attempts} 번 만에 맞혔습니다.");
-                    break;
-                }
+                Console.WriteLine("[경고] 몬스터의 다음 공격이 강화됩니다.");
             }
 
-            bool restart;
-
-            while (true)
+            for (int i = 0; i < playerSkills.Length; i++)
             {
-                Console.Write("\n다시 하시겠습니까? (1 - 재시작 / 0 - 종료) : ");
-                string choice = Console.ReadLine() ?? "";
-
-                if (choice == "1")
-                {
-                    restart = true;
-                    break;
-                }
-
-                if (choice == "0")
-                {
-                    restart = false;
-                    break;
-                }
-
-                Console.WriteLine("1 또는 0 을 입력해주세요.");
+                Console.WriteLine($"{i}: {playerSkills[i]} (데미지 {playerDamage[i]})");
             }
 
-            if (!restart)
+            Console.Write("스킬 번호 or 치트 입력 : ");
+            string input = (Console.ReadLine() ?? "").Trim().ToLower();
+
+            if (input == "god")
             {
-                Console.WriteLine("게임을 종료합니다.");
+                isInvincible = !isInvincible;
+
+                Console.WriteLine(isInvincible ? "무적 ON" : "무적 OFF");
+                continue;
+            }
+
+            if (input == "kill")
+            {
+                monsterHp = 0;
+                Console.WriteLine("[치트] 몬스터를 즉사시켰습니다.");
                 break;
             }
+
+            if (!int.TryParse(input, out int skill))
+            {
+                Console.WriteLine("스킬 번호 or 치트를 입력해주세요.");
+                continue;
+            }
+
+            if (skill < 0 || skill >= playerSkills.Length)
+            {
+                Console.WriteLine("스킬 번호는 0~3 입니다.");
+                continue;
+            }
+
+            int damage = playerDamage[skill];
+            monsterHp -= damage;
+
+            if (monsterHp < 0)
+            {
+                monsterHp = 0;
+            }
+
+            Console.WriteLine($"\n플레이어의 {playerSkills[skill]}! {damage} 데미지!");
+            Console.WriteLine($"몬스터 남은 HP : {monsterHp}");
+
+            if (monsterHp == 0)
+            {
+                break;
+            }
+
+            int monsterSkill;
+
+            if (isCharging)
+            {
+                monsterSkill = 0;
+            }
+            else
+            {
+                monsterSkill = random.Next(0, monsterSkills.Length);
+            }
+
+            switch (monsterSkill)
+            {
+                case 0:
+                    {
+                        int monsterDamage = 10;
+
+                        if (isCharging)
+                        {
+                            monsterDamage = monsterDamage * 3 / 2;
+                            isCharging = false;
+
+                            Console.WriteLine("공격을 강화합니다.");
+                        }
+
+                        bool isCritical = random.Next(0, 100) < 25;
+
+                        if (isCritical)
+                        {
+                            monsterDamage *= 2;
+                            Console.WriteLine("치명타 발생!");
+                        }
+
+                        if (isInvincible)
+                        {
+                            monsterDamage = 0;
+                            Console.WriteLine("[무적] 피해를 받지 않습니다.");
+                        }
+
+                        playerHp -= monsterDamage;
+
+                        if (playerHp < 0)
+                        {
+                            playerHp = 0;
+                        }
+
+                        Console.WriteLine($"몬스터의 {monsterSkills[0]}! {monsterDamage} 데미지!");
+                        Console.WriteLine($"플레이어 남은 HP : {playerHp}");
+                        break;
+                    }
+
+                case 1:
+                    {
+                        isCharging = true;
+
+                        Console.WriteLine($"몬스터의 {monsterSkills[1]}! 이번 턴에는 공격하지 않습니다.");
+                        break;
+                    }
+            }
+
+            turn++;
+        }
+
+        Console.WriteLine("\n===== 전투 종료 =====");
+
+        if (playerHp == 0)
+        {
+            Console.WriteLine("플레이어가 사망했습니다. 게임 오버...");
+        }
+        else
+        {
+            Console.WriteLine("몬스터를 처치했습니다! 승리!");
         }
     }
 }
