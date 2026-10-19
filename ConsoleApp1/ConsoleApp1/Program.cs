@@ -1,224 +1,198 @@
 ﻿using System;
-using System.Text;
 
 class Program
 {
+    // 약 75분?
     static void Main()
     {
-        Console.OutputEncoding = Encoding.UTF8;
-
         Random random = new Random();
 
-        int[] deck = new int[52];
+        Console.WriteLine("===== 로또 당첨기 =====");
 
-        for (int i = 0; i < deck.Length; i++)
+        int mode;
+
+        while (true)
         {
-            deck[i] = i;
-        }
+            Console.Write("1. 사용자 입력 / 2. 자동 : ");
 
-        for (int i = deck.Length - 1; i > 0; i--)
-        {
-            int randomIndex = random.Next(i + 1);
-
-            int temp = deck[i];
-            deck[i] = deck[randomIndex];
-            deck[randomIndex] = temp;
-        }
-
-        long money = 10000;
-        int position = 0;
-        int round = 0;
-
-        Console.WriteLine("===== 월남뽕 =====");
-        Console.WriteLine("A = 1 / J = 11 / Q = 12 / K = 13");
-        Console.WriteLine("승리 : 배팅액 × 2 / 패배 : 배팅액 차감");
-        Console.WriteLine("fold : 해당 판 포기");
-        Console.WriteLine("next : 다음 판 첫 카드 확인");
-        Console.WriteLine("list : 아직 사용하지 않은 카드 목록");
-
-        while (money >= 1000 && deck.Length - position >= 3)
-        {
-            round++;
-
-            int leftCard = deck[position];
-            int hiddenCard = deck[position + 1];
-            int rightCard = deck[position + 2];
-
-            position += 3;
-
-            int leftNumber = GetNumber(leftCard);
-            int rightNumber = GetNumber(rightCard);
-            int hiddenNumber = GetNumber(hiddenCard);
-
-            int minNumber = Math.Min(leftNumber, rightNumber);
-            int maxNumber = Math.Max(leftNumber, rightNumber);
-
-            Console.WriteLine($"\n===== {round} / 17판 =====");
-            Console.WriteLine($"소지금 : {money:N0}원");
-            Console.WriteLine($"{GetCardName(leftCard)} / ? / {GetCardName(rightCard)}");
-            Console.WriteLine($"[치트] 컴퓨터의 숨겨진 패 : {GetCardName(hiddenCard)}");
-
-            if (leftNumber == rightNumber)
+            if (int.TryParse(Console.ReadLine(), out mode))
             {
-                money -= 1000;
-
-                Console.WriteLine("양쪽 숫자가 같습니다. 자동 패배!");
-                Console.WriteLine("1,000원 차감");
-                Console.WriteLine($"남은 소지금 : {money:N0}원");
-
-                continue;
-            }
-
-            long bet = 0;
-            bool folded = false;
-
-            while (true)
-            {
-                Console.Write($"\n배팅액 (1,000 ~ {money:N0}원) 또는 fold / next / list : ");
-
-                string input = (Console.ReadLine() ?? "").Trim().ToLower();
-
-                if (input == "next")
+                if (mode == 1 || mode == 2)
                 {
-                    if (deck.Length - position >= 3)
-                    {
-                        Console.WriteLine($"[치트] 다음 판 첫 카드 : " +GetCardName(deck[position]));
-                    }
-                    else
-                    {
-                        Console.WriteLine("다음 판은 없습니다. 남은 1장은 버려집니다.");
-                    }
-
-                    continue;
-                }
-
-                if (input == "list")
-                {
-                    ShowRemainingCards(deck, position);
-                    continue;
-                }
-
-                if (input == "fold")
-                {
-                    folded = true;
                     break;
                 }
-
-                if (!long.TryParse(input, out bet))
-                {
-                    Console.WriteLine("금액 또는 명령어를 입력해주세요.");
-                    continue;
-                }
-
-                if (bet < 1000 || bet > money)
-                {
-                    Console.WriteLine("1,000원 이상, 소지금 이하로 배팅해주세요.");
-                    continue;
-                }
-
-                break;
             }
 
-            if (folded)
-            {
-                Console.WriteLine("[fold] 돈 차감 없이 이번 판을 종료합니다.");
-                Console.WriteLine("이번 판 카드 3장은 버립니다.");
-                continue;
-            }
-
-            Console.WriteLine("\n[카드 공개]");
-            Console.WriteLine($"{GetCardName(leftCard)} / {GetCardName(hiddenCard)} / {GetCardName(rightCard)}");
-
-            if (hiddenNumber > minNumber && hiddenNumber < maxNumber)
-            {
-                long reward = bet * 2;
-                money += reward;
-
-                Console.WriteLine($"승리! {reward:N0}원 획득!");
-            }
-            else
-            {
-                money -= bet;
-
-                Console.WriteLine($"패배.. {bet:N0}원 차감!");
-            }
-
-            Console.WriteLine($"남은 소지금 : {money:N0}원");
+            Console.WriteLine("1 또는 2 를 입력해주세요.");
         }
 
-        Console.WriteLine("\n===== 게임 종료 =====");
+        int[] playerNumbers;
 
-        if (money == 0)
+        if (mode == 1)
         {
-            Console.WriteLine("소지금을 전부 잃었습니다.");
-        }
-        else if (deck.Length - position < 3)
-        {
-            Console.WriteLine("17판을 모두 진행했습니다.");
-            Console.WriteLine("마지막 남은 카드 1장은 버립니다.");
+            playerNumbers = InputNumbers();
         }
         else
         {
-            Console.WriteLine("최소 배팅 금액인 1,000원이 부족합니다.");
+            playerNumbers = CreateNumbers(random, 6);
+            Console.WriteLine("자동 번호를 생성했습니다.");
         }
 
-        Console.WriteLine($"진행한 판 수 : {round}");
-        Console.WriteLine($"최종 소지금 : {money:N0}원");
-    }
+        int[] winningNumbers = CreateNumbers(random, 7);
 
-    static int GetNumber(int card)
-    {
-        return card % 13 + 1;
-    }
+        int bonusNumber = winningNumbers[6];
 
-    static string GetCardName(int card)
-    {
-        string[] suits = { "♠", "♦", "♣", "♥" };
+        int matchCount = 0;
 
-        int suitIndex = card / 13;
-        int number = GetNumber(card);
-
-        string rank;
-
-        switch (number)
+        for (int i = 0; i < playerNumbers.Length; i++)
         {
-            case 1:
-                rank = "A";
+            for (int j = 0; j < 6; j++)
+            {
+                if (playerNumbers[i] == winningNumbers[j])
+                {
+                    matchCount++;
+                    break;
+                }
+            }
+        }
+
+        bool bonusMatch = false;
+
+        for (int i = 0; i < playerNumbers.Length; i++)
+        {
+            if (playerNumbers[i] == bonusNumber)
+            {
+                bonusMatch = true;
+                break;
+            }
+        }
+
+        Array.Sort(playerNumbers);
+        Array.Sort(winningNumbers, 0, 6);
+
+        Console.WriteLine("\n===== 추첨 결과 =====");
+        Console.Write("내 번호 : ");
+        PrintNumbers(playerNumbers, 6);
+
+        Console.Write("당첨번호 : ");
+        PrintNumbers(winningNumbers, 6);
+
+        Console.WriteLine($"보너스 번호 : {bonusNumber}");
+        Console.WriteLine($"당첨번호 일치 : {matchCount}개");
+        Console.WriteLine($"보너스 일치 : {(bonusMatch ? "O" : "X")}");
+
+        switch (matchCount)
+        {
+            case 6:
+                Console.WriteLine("축하합니다! 1등입니다!!!");
                 break;
 
-            case 11:
-                rank = "J";
+            case 5:
+                if (bonusMatch)
+                {
+                    Console.WriteLine("축하합니다! 2등입니다.");
+                }
+                else
+                {
+                    Console.WriteLine("축하합니다! 3등입니다.");
+                }
                 break;
 
-            case 12:
-                rank = "Q";
+            case 4:
+                Console.WriteLine("축하합니다! 4등입니다.");
                 break;
 
-            case 13:
-                rank = "K";
+            case 3:
+                Console.WriteLine("축하합니다! 5등입니다.");
                 break;
 
             default:
-                rank = number.ToString();
+                Console.WriteLine("낙첨입니다...");
                 break;
         }
-
-        return $"{suits[suitIndex]} {rank}";
     }
 
-    static void ShowRemainingCards(int[] deck, int position)
+    static int[] InputNumbers()
     {
-        Console.WriteLine($"[치트] 남은 카드 : {deck.Length - position}장");
-        Console.WriteLine("(덱에 놓인 순서대로 표시)");
+        int[] numbers = new int[6];
 
-        for (int i = position; i < deck.Length; i++)
+        Console.WriteLine("\n1 ~ 45 사이의 번호를 하나씩 입력해주세요.");
+
+        for (int i = 0; i < numbers.Length;)
         {
-            Console.Write($"[{GetCardName(deck[i])}] ");
+            Console.Write($"{i + 1} 번째 번호 : ");
 
-            if ((i - position + 1) % 5 == 0)
+            if (!int.TryParse(Console.ReadLine(), out int number))
             {
-                Console.WriteLine();
+                Console.WriteLine("정수만 입력할 수 있습니다.");
+                continue;
             }
+
+            if (number < 1 || number > 45)
+            {
+                Console.WriteLine("1 ~ 45 사이로 입력해주세요.");
+                continue;
+            }
+
+            bool duplicate = false;
+
+            for (int j = 0; j < i; j++)
+            {
+                if (numbers[j] == number)
+                {
+                    duplicate = true;
+                    break;
+                }
+            }
+
+            if (duplicate)
+            {
+                Console.WriteLine("이미 입력한 번호입니다.");
+                continue;
+            }
+
+            numbers[i] = number;
+            i++;
+        }
+
+        return numbers;
+    }
+
+    static int[] CreateNumbers(Random random, int count)
+    {
+        int[] numbers = new int[count];
+
+        for (int i = 0; i < numbers.Length;)
+        {
+            int number = random.Next(1, 46);
+            bool duplicate = false;
+
+            for (int j = 0; j < i; j++)
+            {
+                if (numbers[j] == number)
+                {
+                    duplicate = true;
+                    break;
+                }
+            }
+
+            if (duplicate)
+            {
+                continue;
+            }
+
+            numbers[i] = number;
+            i++;
+        }
+
+        return numbers;
+    }
+
+    static void PrintNumbers(int[] numbers, int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            Console.Write($"{numbers[i]} ");
         }
 
         Console.WriteLine();
