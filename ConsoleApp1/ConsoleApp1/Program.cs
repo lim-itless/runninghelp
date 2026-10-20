@@ -2,197 +2,168 @@
 
 class Program
 {
-    // 약 75분?
     static void Main()
     {
-        Random random = new Random();
+        while (true)
+        {
+            Console.WriteLine("\n===== 문자열 활용 =====");
+            Console.WriteLine("1) 문자열 거꾸로 출력");
+            Console.WriteLine("2) 짝수 번째 문자끼리 뒤집기");
+            Console.WriteLine("3) 숫자만 출력");
+            Console.WriteLine("4) 특정 문자 개수 세기");
+            Console.WriteLine("5) 주민번호의 하이픈과 공백 제거");
+            Console.WriteLine("0) 종료");
+            Console.Write("선택 : ");
 
-        Console.WriteLine("===== 로또 당첨기 =====");
+            string menu = Console.ReadLine() ?? "";
 
-        int mode;
+            switch (menu)
+            {
+                case "1":
+                    ReverseText();
+                    break;
+
+                case "2":
+                    ReverseEvenPositions();
+                    break;
+
+                case "3":
+                    PrintNumbersOnly();
+                    break;
+
+                case "4":
+                    CountCharacter();
+                    break;
+
+                case "5":
+                    RemoveHyphen();
+                    break;
+
+                case "0":
+                    Console.WriteLine("프로그램을 종료합니다.");
+                    return;
+
+                default:
+                    Console.WriteLine("0 ~ 5 중에서 선택해주세요.");
+                    break;
+            }
+        }
+    }
+
+    static void ReverseText()
+    {
+        Console.Write("문자열 입력 : ");
+        string text = Console.ReadLine() ?? "";
+
+        Console.Write("결과 : ");
+
+        for (int i = text.Length - 1; i >= 0; i--)
+        {
+            Console.Write(text[i]);
+        }
+
+        Console.WriteLine();
+    }
+
+    static void ReverseEvenPositions()
+    {
+        Console.Write("문자열 입력 : ");
+        string text = Console.ReadLine() ?? "";
+
+        char[] characters = text.ToCharArray();
+
+        int left = 1;
+        int right = text.Length - 1;
+
+        if (right % 2 == 0)
+        {
+            right--;
+        }
+
+        while (left < right)
+        {
+            char temp = characters[left];
+            characters[left] = characters[right];
+            characters[right] = temp;
+
+            left += 2;
+            right -= 2;
+        }
+
+        Console.Write("결과 : ");
+
+        for (int i = 0; i < characters.Length; i++)
+        {
+            Console.Write(characters[i]);
+        }
+
+        Console.WriteLine();
+    }
+
+    static void PrintNumbersOnly()
+    {
+        Console.Write("문자열 입력 : ");
+        string text = Console.ReadLine() ?? "";
+
+        Console.Write("결과 : ");
+
+        for (int i = 0; i < text.Length; i++)
+        {
+            if (text[i] >= '0' && text[i] <= '9')
+            {
+                Console.Write(text[i]);
+            }
+        }
+
+        Console.WriteLine();
+    }
+
+    static void CountCharacter()
+    {
+        Console.Write("문자열 입력 : ");
+        string text = Console.ReadLine() ?? "";
+        char target;
 
         while (true)
         {
-            Console.Write("1. 사용자 입력 / 2. 자동 : ");
+            Console.Write("찾을 문자 하나 입력 : ");
+            string input = Console.ReadLine() ?? "";
 
-            if (int.TryParse(Console.ReadLine(), out mode))
+            if (input.Length == 1)
             {
-                if (mode == 1 || mode == 2)
-                {
-                    break;
-                }
+                target = input[0];
+                break;
             }
 
-            Console.WriteLine("1 또는 2 를 입력해주세요.");
+            Console.WriteLine("문자를 정확히 하나 입력해주세요.");
         }
 
-        int[] playerNumbers;
+        int count = 0;
 
-        if (mode == 1)
+        for (int i = 0; i < text.Length; i++)
         {
-            playerNumbers = InputNumbers();
-        }
-        else
-        {
-            playerNumbers = CreateNumbers(random, 6);
-            Console.WriteLine("자동 번호를 생성했습니다.");
-        }
-
-        int[] winningNumbers = CreateNumbers(random, 7);
-
-        int bonusNumber = winningNumbers[6];
-
-        int matchCount = 0;
-
-        for (int i = 0; i < playerNumbers.Length; i++)
-        {
-            for (int j = 0; j < 6; j++)
+            if (text[i] == target)
             {
-                if (playerNumbers[i] == winningNumbers[j])
-                {
-                    matchCount++;
-                    break;
-                }
+                count++;
             }
         }
 
-        bool bonusMatch = false;
-
-        for (int i = 0; i < playerNumbers.Length; i++)
-        {
-            if (playerNumbers[i] == bonusNumber)
-            {
-                bonusMatch = true;
-                break;
-            }
-        }
-
-        Array.Sort(playerNumbers);
-        Array.Sort(winningNumbers, 0, 6);
-
-        Console.WriteLine("\n===== 추첨 결과 =====");
-        Console.Write("내 번호 : ");
-        PrintNumbers(playerNumbers, 6);
-
-        Console.Write("당첨번호 : ");
-        PrintNumbers(winningNumbers, 6);
-
-        Console.WriteLine($"보너스 번호 : {bonusNumber}");
-        Console.WriteLine($"당첨번호 일치 : {matchCount}개");
-        Console.WriteLine($"보너스 일치 : {(bonusMatch ? "O" : "X")}");
-
-        switch (matchCount)
-        {
-            case 6:
-                Console.WriteLine("축하합니다! 1등입니다!!!");
-                break;
-
-            case 5:
-                if (bonusMatch)
-                {
-                    Console.WriteLine("축하합니다! 2등입니다.");
-                }
-                else
-                {
-                    Console.WriteLine("축하합니다! 3등입니다.");
-                }
-                break;
-
-            case 4:
-                Console.WriteLine("축하합니다! 4등입니다.");
-                break;
-
-            case 3:
-                Console.WriteLine("축하합니다! 5등입니다.");
-                break;
-
-            default:
-                Console.WriteLine("낙첨입니다...");
-                break;
-        }
+        Console.WriteLine($"결과 : {count}개");
     }
 
-    static int[] InputNumbers()
+    static void RemoveHyphen()
     {
-        int[] numbers = new int[6];
+        Console.Write("주민번호 입력 : ");
+        string text = Console.ReadLine() ?? "";
 
-        Console.WriteLine("\n1 ~ 45 사이의 번호를 하나씩 입력해주세요.");
+        Console.Write("결과 : ");
 
-        for (int i = 0; i < numbers.Length;)
+        for (int i = 0; i < text.Length; i++)
         {
-            Console.Write($"{i + 1} 번째 번호 : ");
-
-            if (!int.TryParse(Console.ReadLine(), out int number))
+            if (text[i] != '-' && text[i] != ' ')
             {
-                Console.WriteLine("정수만 입력할 수 있습니다.");
-                continue;
+                Console.Write(text[i]);
             }
-
-            if (number < 1 || number > 45)
-            {
-                Console.WriteLine("1 ~ 45 사이로 입력해주세요.");
-                continue;
-            }
-
-            bool duplicate = false;
-
-            for (int j = 0; j < i; j++)
-            {
-                if (numbers[j] == number)
-                {
-                    duplicate = true;
-                    break;
-                }
-            }
-
-            if (duplicate)
-            {
-                Console.WriteLine("이미 입력한 번호입니다.");
-                continue;
-            }
-
-            numbers[i] = number;
-            i++;
-        }
-
-        return numbers;
-    }
-
-    static int[] CreateNumbers(Random random, int count)
-    {
-        int[] numbers = new int[count];
-
-        for (int i = 0; i < numbers.Length;)
-        {
-            int number = random.Next(1, 46);
-            bool duplicate = false;
-
-            for (int j = 0; j < i; j++)
-            {
-                if (numbers[j] == number)
-                {
-                    duplicate = true;
-                    break;
-                }
-            }
-
-            if (duplicate)
-            {
-                continue;
-            }
-
-            numbers[i] = number;
-            i++;
-        }
-
-        return numbers;
-    }
-
-    static void PrintNumbers(int[] numbers, int count)
-    {
-        for (int i = 0; i < count; i++)
-        {
-            Console.Write($"{numbers[i]} ");
         }
 
         Console.WriteLine();
