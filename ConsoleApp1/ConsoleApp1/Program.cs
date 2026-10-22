@@ -1,216 +1,181 @@
 ﻿using System;
 
-class Program
+GameData[] games = new GameData[]
 {
-    static void Main()
+    new GameData
     {
-        Random random = new Random();
+        Title = "스타듀밸리",
+        Rating = AgeRating.All,
+        Price = 16000,
+        Score = 9.5,
+        Notes = (false, false, false)
+    },
 
-        Console.WriteLine("===== 주민등록번호 형식 문자열 생성기 =====");
+    new GameData
+    {
+        Title = "마인크래프트",
+        Rating = AgeRating.All,
+        Price = 30000,
+        Score = 9.2,
+        Notes = (false, false, false)
+    },
 
-        int year = InputYear();
-        int month = ReadNumber("월 입력 : ", 1, 12);
-        int maxDay = DateTime.DaysInMonth(year, month);
-        int day = ReadNumber($"일 입력 (1 ~ {maxDay}) : ", 1, maxDay);
-        bool isMale = InputGender(random);
+    new GameData
+    {
+        Title = "그레이브야드 키퍼",
+        Rating = AgeRating.Adult,
+        Price = 21000,
+        Score = 8.5,
+        Notes = (true, false, true)
+    },
 
-        Console.WriteLine($"\n생성 결과 : {CreateNumber(year, month, day, isMale, random)}");
+    new GameData
+    {
+        Title = "팰월드",
+        Rating = AgeRating.Teen,
+        Price = 32000,
+        Score = 9.0,
+        Notes = (false, true, true)
+    },
 
-        int regenerateCount = 0;
+    new GameData
+    {
+        Title = "오버쿡드 2",
+        Rating = AgeRating.All,
+        Price = 26000,
+        Score = 8.8,
+        Notes = (true, false, false)
+    }
+};
 
-        while (regenerateCount < 3)
-        {
-            Console.Write($"\n자동으로 다시 생성할까요? (Y / N, 남은 횟수 : {3 - regenerateCount}) : ");
+while (true)
+{
+    Console.WriteLine("\n===== 게임 데이터베이스 =====");
+    Console.WriteLine("1. 모든 게임 정보 출력");
+    Console.WriteLine("2. 특정 조건 게임 출력");
+    Console.WriteLine("3. 종료");
+    Console.Write("선택 : ");
 
-            string choice = (Console.ReadLine() ?? "").Trim().ToUpper();
+    string menu = Console.ReadLine() ?? "";
 
-            if (choice == "N") break;
-
-            if (choice != "Y")
+    switch (menu)
+    {
+        case "1":
+            for (int i = 0; i < games.Length; i++)
             {
-                Console.WriteLine("Y 또는 N 을 입력해주세요.");
-                continue;
+                PrintGame(games[i]);
             }
+            break;
 
-            year = random.Next(1900, 2100);
-            month = random.Next(1, 13);
-            maxDay = DateTime.DaysInMonth(year, month);
-            day = random.Next(1, maxDay + 1);
-            isMale = random.Next(0, 2) == 0;
+        case "2":
+            FilterGames(games);
+            break;
 
-            regenerateCount++;
+        case "3":
+            Console.WriteLine("프로그램을 종료합니다.");
+            return;
 
-            Console.WriteLine($"\n자동 생성 {regenerateCount} / 3 : " +CreateNumber(year, month, day, isMale, random));
-        }
+        default:
+            Console.WriteLine("1~3 중에서 선택해주세요.");
+            break;
+    }
+}
 
-        if (regenerateCount == 3)
-        {
-            Console.WriteLine("\n자동 재생성 3회를 모두 사용했습니다.");
-        }
+static void PrintGame(GameData game)
+{
+    Console.WriteLine("\n------------------------------");
+    Console.WriteLine($"타이틀 : {game.Title}");
+    Console.WriteLine($"이용 등급 : {game.Rating}");
+    Console.WriteLine($"가격 : {game.Price:N0}원");
+    Console.WriteLine($"평점 : {game.Score:F1} / 10");
+    Console.WriteLine("특이사항 :");
 
-        Console.WriteLine("프로그램을 종료합니다.");
+    bool hasNotes = false;
+
+    if (game.Notes.DlcSoon)
+    {
+        Console.WriteLine("- DLC 곧 출시");
+        hasNotes = true;
     }
 
-    static int InputYear()
+    if (game.Notes.PoorOptimization)
     {
-        while (true)
-        {
-            Console.Write("\n생년 입력 (2자리 또는 4자리) : ");
-            string input = (Console.ReadLine() ?? "").Trim();
-
-            if (input.Length != 2 && input.Length != 4)
-            {
-                Console.WriteLine("예 : 05 또는 2005 처럼 입력해주세요.");
-                continue;
-            }
-
-            bool digitsOnly = true;
-
-            for (int i = 0; i < input.Length; i++)
-            {
-                if (input[i] < '0' || input[i] > '9')
-                {
-                    digitsOnly = false;
-                    break;
-                }
-            }
-
-            if (!digitsOnly)
-            {
-                Console.WriteLine("숫자만 입력해주세요.");
-                continue;
-            }
-
-            int year = int.Parse(input);
-
-            if (input.Length == 4)
-            {
-                if (year < 1900 || year > 2099)
-                {
-                    Console.WriteLine("1900 ~ 2099년 사이로 입력해주세요.");
-                    continue;
-                }
-
-                return year;
-            }
-
-            int defaultYear;
-
-            if (year <= 24)
-            {
-                defaultYear = 2000 + year;
-            }
-            else
-            {
-                defaultYear = 1900 + year;
-            }
-
-            while (true)
-            {
-                Console.WriteLine($"1. {1900 + year}년");
-                Console.WriteLine($"2. {2000 + year}년");
-                Console.Write($"선택 (엔터 : 자동으로 {defaultYear}년) : ");
-
-                string choice = (Console.ReadLine() ?? "").Trim();
-
-                switch (choice)
-                {
-                    case "1":
-                        return 1900 + year;
-
-                    case "2":
-                        return 2000 + year;
-
-                    case "":
-                        return defaultYear;
-
-                    default:
-                        Console.WriteLine("1, 2 또는 엔터를 입력해주세요.");
-                        break;
-                }
-            }
-        }
+        Console.WriteLine("- 최적화 좋지 않음");
+        hasNotes = true;
     }
 
-    static int ReadNumber(string message, int min, int max)
+    if (game.Notes.ManyBugs)
     {
-        while (true)
-        {
-            Console.Write(message);
-            string input = (Console.ReadLine() ?? "").Trim();
-
-            if (int.TryParse(input, out int number))
-            {
-                if (number >= min && number <= max)
-                {
-                    return number;
-                }
-            }
-
-            Console.WriteLine($"{min} ~ {max} 사이의 정수를 입력해주세요.");
-        }
+        Console.WriteLine("- 버그 매우 많음");
+        hasNotes = true;
     }
 
-    static bool InputGender(Random random)
+    if (!hasNotes)
     {
-        while (true)
+        Console.WriteLine("- 없음");
+    }
+}
+
+static void FilterGames(GameData[] games)
+{
+    Console.WriteLine("\n===== 검색 조건 =====");
+    Console.WriteLine("1. 평점 9.0 이상");
+    Console.WriteLine("2. Adult 등급");
+    Console.WriteLine("3. 특이사항이 있음");
+    Console.Write("선택 : ");
+
+    string condition = Console.ReadLine() ?? "";
+
+    if (condition != "1" && condition != "2" && condition != "3")
+    {
+        Console.WriteLine("잘못된 조건입니다.");
+        return;
+    }
+
+    int count = 0;
+
+    for (int i = 0; i < games.Length; i++)
+    {
+        bool matches = false;
+
+        switch (condition)
         {
-            Console.Write("성별 입력 (남자 : 1 또는 3 / 여자 : 2 또는 4 / 그 외 정수 : 무작위) : ");
+            case "1":
+                matches = games[i].Score >= 9.0;
+                break;
 
-            if (!int.TryParse(Console.ReadLine(), out int choice))
-            {
-                Console.WriteLine("정수로 입력해주세요.");
-                continue;
-            }
+            case "2":
+                matches = games[i].Rating == AgeRating.Adult;
+                break;
 
-            switch (choice)
-            {
-                case 1:
-                case 3:
-                    return true;
+            case "3":
+                matches = games[i].Notes.DlcSoon || games[i].Notes.PoorOptimization || games[i].Notes.ManyBugs;
+                break;
+        }
 
-                case 2:
-                case 4:
-                    return false;
-
-                default:
-                    bool isMale = random.Next(0, 2) == 0;
-                    Console.WriteLine($"무작위 성별 : {(isMale ? "남자" : "여자")}");
-                    return isMale;
-            }
+        if (matches)
+        {
+            PrintGame(games[i]);
+            count++;
         }
     }
 
-    static string CreateNumber(int year, int month, int day, bool isMale, Random random)
-    {
-        int genderCode;
+    Console.WriteLine($"\n검색 결과 : {count}개");
+}
 
-        if (year < 2000)
-        {
-            genderCode = isMale ? 1 : 2;
-        }
-        else
-        {
-            genderCode = isMale ? 3 : 4;
-        }
+enum AgeRating
+{
+    All,
+    Teen,
+    Adult
+}
 
-        string lastSix = "";
-        int previousNumber = genderCode;
+struct GameData
+{
+    public string Title;
+    public AgeRating Rating;
+    public int Price;
+    public double Score;
 
-        for (int i = 0; i < 6; i++)
-        {
-            int number;
-
-            do
-            {
-                number = random.Next(1, 10);
-            }
-            while (number == previousNumber);
-
-            lastSix += number;
-            previousNumber = number;
-        }
-
-        return $"{year % 100:D2}{month:D2}{day:D2} - {genderCode}{lastSix}";
-    }
+    public (bool DlcSoon, bool PoorOptimization, bool ManyBugs) Notes;
 }
