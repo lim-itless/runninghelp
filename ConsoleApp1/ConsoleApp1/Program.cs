@@ -1,181 +1,211 @@
 ﻿using System;
 
-GameData[] games = new GameData[]
+class Program
 {
-    new GameData
+    static int playerHP = 100;
+    static int playerAtk = 10;
+    static int gold = 0;
+    static int trainingCount = 0;
+    static bool isBossDefeated = false;
+    static int explorationProgress = 0;
+
+    static Random random = new Random();
+
+    static void Main()
     {
-        Title = "스타듀밸리",
-        Rating = AgeRating.All,
-        Price = 16000,
-        Score = 9.5,
-        Notes = (false, false, false)
-    },
+        Console.WriteLine("=== 모험가 키우기 ===");
+        Console.WriteLine("Space: 훈련 / H: 탐험 / B: 보스전");
+        Console.WriteLine("R: 상태 확인 / Esc: 종료");
 
-    new GameData
-    {
-        Title = "마인크래프트",
-        Rating = AgeRating.All,
-        Price = 30000,
-        Score = 9.2,
-        Notes = (false, false, false)
-    },
+        while (true)
+        {
+            Console.Write("\n행동할 키를 누르세요: ");
+            ConsoleKey key = Console.ReadKey(true).Key;
+            Console.WriteLine();
 
-    new GameData
-    {
-        Title = "그레이브야드 키퍼",
-        Rating = AgeRating.Adult,
-        Price = 21000,
-        Score = 8.5,
-        Notes = (true, false, true)
-    },
-
-    new GameData
-    {
-        Title = "팰월드",
-        Rating = AgeRating.Teen,
-        Price = 32000,
-        Score = 9.0,
-        Notes = (false, true, true)
-    },
-
-    new GameData
-    {
-        Title = "오버쿡드 2",
-        Rating = AgeRating.All,
-        Price = 26000,
-        Score = 8.8,
-        Notes = (true, false, false)
-    }
-};
-
-while (true)
-{
-    Console.WriteLine("\n===== 게임 데이터베이스 =====");
-    Console.WriteLine("1. 모든 게임 정보 출력");
-    Console.WriteLine("2. 특정 조건 게임 출력");
-    Console.WriteLine("3. 종료");
-    Console.Write("선택 : ");
-
-    string menu = Console.ReadLine() ?? "";
-
-    switch (menu)
-    {
-        case "1":
-            for (int i = 0; i < games.Length; i++)
+            switch (key)
             {
-                PrintGame(games[i]);
+                case ConsoleKey.Spacebar:
+                    MorningTrain();
+                    break;
+
+                case ConsoleKey.H:
+                    Explore();
+                    break;
+
+                case ConsoleKey.B:
+                    FightBoss();
+                    break;
+
+                case ConsoleKey.R:
+                    CheckStatus();
+                    break;
+
+                case ConsoleKey.Escape:
+                    Console.WriteLine("프로그램을 종료합니다.");
+                    return;
+
+                default:
+                    Console.WriteLine("안내된 키를 눌러주세요.");
+                    break;
             }
-            break;
+        }
+    }
 
-        case "2":
-            FilterGames(games);
-            break;
-
-        case "3":
-            Console.WriteLine("프로그램을 종료합니다.");
+    static void MorningTrain()
+    {
+        if (playerHP <= 0)
+        {
+            Console.WriteLine("체력이 없어 훈련할 수 없습니다.");
             return;
-
-        default:
-            Console.WriteLine("1~3 중에서 선택해주세요.");
-            break;
-    }
-}
-
-static void PrintGame(GameData game)
-{
-    Console.WriteLine("\n------------------------------");
-    Console.WriteLine($"타이틀 : {game.Title}");
-    Console.WriteLine($"이용 등급 : {game.Rating}");
-    Console.WriteLine($"가격 : {game.Price:N0}원");
-    Console.WriteLine($"평점 : {game.Score:F1} / 10");
-    Console.WriteLine("특이사항 :");
-
-    bool hasNotes = false;
-
-    if (game.Notes.DlcSoon)
-    {
-        Console.WriteLine("- DLC 곧 출시");
-        hasNotes = true;
-    }
-
-    if (game.Notes.PoorOptimization)
-    {
-        Console.WriteLine("- 최적화 좋지 않음");
-        hasNotes = true;
-    }
-
-    if (game.Notes.ManyBugs)
-    {
-        Console.WriteLine("- 버그 매우 많음");
-        hasNotes = true;
-    }
-
-    if (!hasNotes)
-    {
-        Console.WriteLine("- 없음");
-    }
-}
-
-static void FilterGames(GameData[] games)
-{
-    Console.WriteLine("\n===== 검색 조건 =====");
-    Console.WriteLine("1. 평점 9.0 이상");
-    Console.WriteLine("2. Adult 등급");
-    Console.WriteLine("3. 특이사항이 있음");
-    Console.Write("선택 : ");
-
-    string condition = Console.ReadLine() ?? "";
-
-    if (condition != "1" && condition != "2" && condition != "3")
-    {
-        Console.WriteLine("잘못된 조건입니다.");
-        return;
-    }
-
-    int count = 0;
-
-    for (int i = 0; i < games.Length; i++)
-    {
-        bool matches = false;
-
-        switch (condition)
-        {
-            case "1":
-                matches = games[i].Score >= 9.0;
-                break;
-
-            case "2":
-                matches = games[i].Rating == AgeRating.Adult;
-                break;
-
-            case "3":
-                matches = games[i].Notes.DlcSoon || games[i].Notes.PoorOptimization || games[i].Notes.ManyBugs;
-                break;
         }
 
-        if (matches)
+        if (trainingCount >= 3)
         {
-            PrintGame(games[i]);
-            count++;
+            Console.WriteLine("훈련은 하루에 3번까지만 가능합니다.");
+            return;
+        }
+
+        Console.WriteLine("\n===== 훈련 시작 =====");
+
+        for (int i = 1; i <= 10; i++)
+        {
+            Console.WriteLine($"칼을 휘두릅니다! ({i}회)");
+        }
+
+        playerAtk += 5;
+        trainingCount++;
+
+        Console.WriteLine($"훈련 완료! 현재 공격력 : {playerAtk}");
+        Console.WriteLine($"오늘의 훈련 횟수 : {trainingCount} / 3");
+    }
+
+    static void Explore()
+    {
+        if (playerHP <= 0)
+        {
+            Console.WriteLine("체력이 없어 탐험할 수 없습니다.");
+            return;
+        }
+
+        explorationProgress = 0;
+
+        Console.WriteLine("\n===== 황야 탐험 시작 =====");
+
+        while (explorationProgress < 100)
+        {
+            explorationProgress += 20;
+            Console.WriteLine($"탐험 진행도 : {explorationProgress}%");
+
+            if (random.Next(0, 100) < 20)
+            {
+                playerHP -= 10;
+
+                if (playerHP < 0)
+                {
+                    playerHP = 0;
+                }
+
+                Console.WriteLine($"함정에 걸렸습니다! 체력 -10 / 현재 HP : {playerHP}");
+            }
+
+            if (playerHP <= 0)
+            {
+                Console.WriteLine("탐험 실패...");
+                break;
+            }
+        }
+
+        if (explorationProgress >= 100 && playerHP > 0)
+        {
+            gold += 50;
+            Console.WriteLine($"탐험 성공! 골드 +50 / 보유 골드 : {gold}");
         }
     }
 
-    Console.WriteLine($"\n검색 결과 : {count}개");
-}
+    static void FightBoss()
+    {
+        if (isBossDefeated)
+        {
+            Console.WriteLine("이미 보스를 처치했습니다.");
+            return;
+        }
 
-enum AgeRating
-{
-    All,
-    Teen,
-    Adult
-}
+        if (playerHP <= 0)
+        {
+            Console.WriteLine("체력이 없어 보스전에 도전할 수 없습니다.");
+            return;
+        }
 
-struct GameData
-{
-    public string Title;
-    public AgeRating Rating;
-    public int Price;
-    public double Score;
+        int bossHP = 100;
+        bool isFirstHit = true;
+        int battleTurn = 0;
 
-    public (bool DlcSoon, bool PoorOptimization, bool ManyBugs) Notes;
+        Console.WriteLine("\n===== 보스전 입장 =====");
+
+        do
+        {
+            battleTurn++;
+
+            Console.WriteLine($"\n[전투 {battleTurn}턴]");
+
+            bossHP -= playerAtk;
+
+            if (isFirstHit && bossHP <= 0)
+            {
+                bossHP = 1;
+                Console.WriteLine("보스의 방어막을 부쉈습니다!");
+            }
+
+            isFirstHit = false;
+
+            if (bossHP < 0)
+            {
+                bossHP = 0;
+            }
+
+            Console.WriteLine($"플레이어 공격! 데미지 : {playerAtk} / 보스 HP : {bossHP}");
+            Console.WriteLine("보스가 반격합니다!");
+
+            playerHP -= 20;
+
+            if (playerHP < 0)
+            {
+                playerHP = 0;
+            }
+
+            Console.WriteLine($"플레이어 HP : {playerHP}");
+        }
+        while (bossHP > 0 && playerHP > 0);
+
+        if (bossHP <= 0)
+        {
+            isBossDefeated = true;
+            Console.WriteLine("\n보스를 처치했습니다!");
+        }
+
+        if (playerHP <= 0)
+        {
+            Console.WriteLine("플레이어가 사망했습니다...");
+        }
+    }
+
+    static void CheckStatus()
+    {
+        Console.WriteLine("\n===== 현재 상태 =====");
+        Console.WriteLine($"HP : {playerHP}");
+        Console.WriteLine($"공격력 : {playerAtk}");
+        Console.WriteLine($"골드 : {gold}");
+        Console.WriteLine($"오늘의 훈련 횟수 : {trainingCount} / 3");
+        Console.WriteLine($"보스 처치 여부 : {(isBossDefeated ? "처치 완료" : "미처치")}");
+
+        if (playerHP <= 20)
+        {
+            ConsoleColor previousColor = Console.ForegroundColor;
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("휴식이 절실합니다...");
+            Console.ForegroundColor = previousColor;
+        }
+    }
 }
