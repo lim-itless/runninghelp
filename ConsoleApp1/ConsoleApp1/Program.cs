@@ -2,37 +2,40 @@
 
 class Program
 {
-    static string[] inventory = new string[5];
-    static string[] fieldItems = {"물약", "녹슨 검", "금화", "독사과", "방패"};
+    public static int[] monsterDeck = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
-    static int fieldIndex = 0;
+    static Random random = new Random();
 
     static void Main()
     {
-        Start();
+        Console.WriteLine("===== 몬스터 카드 덱 매니저 =====");
+        Console.WriteLine("W : 첫 카드와 마지막 카드 교체");
+        Console.WriteLine("S : 전체 덱 섞기");
+        Console.WriteLine("SPACE : 카드 대결");
+        Console.WriteLine("ESC : 종료");
+
+        ShowDeck();
 
         while (true)
         {
-            Console.Write("\n행동할 키를 누르세요 : ");
+            Console.Write("\n행동할 키를 입력하세요 : ");
             ConsoleKey key = Console.ReadKey(true).Key;
             Console.WriteLine();
 
             switch (key)
             {
-                case ConsoleKey.I:
-                    ShowInventory();
-                    break;
-
-                case ConsoleKey.G:
-                    GetItem();
-                    break;
-
-                case ConsoleKey.U:
-                    UseItem();
+                case ConsoleKey.W:
+                    SwapFirstAndLast();
                     break;
 
                 case ConsoleKey.S:
-                    DiscardPoisonApples();
+                    Shuffle();
+                    Console.WriteLine("덱을 섞었습니다.");
+                    ShowDeck();
+                    break;
+
+                case ConsoleKey.Spacebar:
+                    Battle();
                     break;
 
                 case ConsoleKey.Escape:
@@ -40,110 +43,73 @@ class Program
                     return;
 
                 default:
-                    Console.WriteLine("I, G, U, S 또는 Esc를 눌러주세요.");
+                    Console.WriteLine("W, S, SPACE 또는 ESC를 눌러주세요.");
                     break;
             }
         }
     }
 
-    static void Start()
+    static void ShowDeck()
     {
-        for (int i = 0; i < inventory.Length; i++)
+        Console.Write("현재 덱 : ");
+
+        for (int i = 0; i < monsterDeck.Length; i++)
         {
-            inventory[i] = "비어있음";
+            Console.Write($"[{monsterDeck[i]}] ");
         }
 
-        Console.WriteLine("===== 인벤토리 관리 시스템 =====");
-        Console.WriteLine("I : 인벤토리 확인");
-        Console.WriteLine("G : 필드 아이템 하나 획득");
-        Console.WriteLine("U : 1번 슬롯 아이템 사용");
-        Console.WriteLine("S : 독사과 모두 버리기");
-        Console.WriteLine("ESC : 종료");
+        Console.WriteLine();
     }
 
-    static void ShowInventory()
+    static void SwapFirstAndLast()
     {
-        Console.WriteLine("\n===== 인벤토리 =====");
+        int lastIndex = monsterDeck.Length - 1;
 
-        for (int i = 0; i < inventory.Length; i++)
-        {
-            Console.WriteLine($"[{i + 1}번 슬롯] : {inventory[i]}");
-        }
+        int temp = monsterDeck[0];
+        monsterDeck[0] = monsterDeck[lastIndex];
+        monsterDeck[lastIndex] = temp;
+
+        Console.WriteLine("첫 카드와 마지막 카드를 교체했습니다!");
+        ShowDeck();
     }
 
-    static void GetItem()
+    static void Shuffle()
     {
-        bool acquired = false;
-        bool hasEmptySlot = false;
-
-        for (int i = 0; i < inventory.Length; i++)
+        for (int i = 0; i < monsterDeck.Length; i++)
         {
-            if (inventory[i] == "비어있음")
-            {
-                hasEmptySlot = true;
+            int randomIndex = random.Next(0, monsterDeck.Length);
 
-                if (fieldIndex < fieldItems.Length)
-                {
-                    inventory[i] = fieldItems[fieldIndex];
-
-                    Console.WriteLine($"{inventory[i]}(을)를 획득했습니다. [{i + 1}번 슬롯]");
-
-                    fieldIndex++;
-                    acquired = true;
-                }
-
-                break;
-            }
-        }
-
-        if (!hasEmptySlot)
-        {
-            Console.WriteLine("가방이 가득 찼습니다!");
-        }
-        else if (!acquired)
-        {
-            Console.WriteLine("필드에 남아 있는 아이템이 없습니다.");
+            int temp = monsterDeck[i];
+            monsterDeck[i] = monsterDeck[randomIndex];
+            monsterDeck[randomIndex] = temp;
         }
     }
 
-    static void UseItem()
+    static void Battle()
     {
-        if (inventory[0] == "비어있음")
+        int playerPower = monsterDeck[0];
+        int bossPower = random.Next(1, 11);
+
+        Console.WriteLine("\n===== 카드 대결 =====");
+        Console.WriteLine($"내 카드 공격력 : {playerPower}");
+        Console.WriteLine($"보스 공격력 : {bossPower}");
+
+        if (playerPower > bossPower)
         {
-            Console.WriteLine("1번 슬롯이 비어있습니다.");
-            return;
+            Console.WriteLine("승리!");
+        }
+        else if (playerPower < bossPower)
+        {
+            Console.WriteLine("패배!");
+        }
+        else
+        {
+            Console.WriteLine("무승부!");
         }
 
-        Console.WriteLine(inventory[0] + "(을)를 사용했습니다!");
+        Shuffle();
 
-        inventory[0] = "비어있음";
-
-        for (int i = 0; i < inventory.Length - 1; i++)
-        {
-            inventory[i] = inventory[i + 1];
-        }
-
-        inventory[inventory.Length - 1] = "비어있음";
-    }
-
-    static void DiscardPoisonApples()
-    {
-        int count = 0;
-
-        for (int i = 0; i < inventory.Length; i++)
-        {
-            if (inventory[i] == "독사과")
-            {
-                inventory[i] = "비어있음";
-                count++;
-
-                Console.WriteLine($"[{i + 1}번 슬롯] 의 독사과를 버렸습니다!");
-            }
-        }
-
-        if (count == 0)
-        {
-            Console.WriteLine("가방에 독사과가 없습니다.");
-        }
+        Console.WriteLine("\n대결 후 덱을 다시 섞었습니다.");
+        ShowDeck();
     }
 }
