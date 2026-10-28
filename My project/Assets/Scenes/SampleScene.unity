@@ -392,7 +392,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 536924544}
-  - component: {fileID: 536924543}
+  - component: {fileID: 536924545}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -400,19 +400,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &536924543
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 536924542}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55912fff5797a0b4a911880808f6af0c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MonsterDeckManager
-  monsterDeck: 0100000002000000030000000400000005000000060000000700000008000000090000000a000000
 --- !u!4 &536924544
 Transform:
   m_ObjectHideFlags: 0
@@ -428,6 +415,30 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &536924545
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 536924542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d95ecd25c0cb16c4e90f1241dd32fc95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CardDeckManager
+  masterCards:
+  - "\uC6A9\uC0AC"
+  - "\uB9C8\uBC95\uC0AC"
+  - "\uAD81\uC218"
+  - "\uB3C4\uB451"
+  - "\uAE30\uC0AC"
+  - "\uD790\uB7EC"
+  - "\uB4DC\uB798\uACE4"
+  - "\uC2AC\uB77C\uC784"
+  - "\uACE8\uB818"
+  - "\uC554\uC0B4\uC790"
+  playerDeck: []
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
