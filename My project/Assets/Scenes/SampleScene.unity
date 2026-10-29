@@ -424,21 +424,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 536924542}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d95ecd25c0cb16c4e90f1241dd32fc95, type: 3}
+  m_Script: {fileID: 11500000, guid: 59f7bce3d5cfa1a448f05fac581f3e07, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CardDeckManager
-  masterCards:
-  - "\uC6A9\uC0AC"
-  - "\uB9C8\uBC95\uC0AC"
-  - "\uAD81\uC218"
-  - "\uB3C4\uB451"
-  - "\uAE30\uC0AC"
-  - "\uD790\uB7EC"
-  - "\uB4DC\uB798\uACE4"
-  - "\uC2AC\uB77C\uC784"
-  - "\uACE8\uB818"
-  - "\uC554\uC0B4\uC790"
-  playerDeck: []
+  m_EditorClassIdentifier: Assembly-CSharp::WeightedLootSystem
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
