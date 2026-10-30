@@ -424,9 +424,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 536924542}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59f7bce3d5cfa1a448f05fac581f3e07, type: 3}
+  m_Script: {fileID: 11500000, guid: 07a27c12d3a84a6468bb81b2b0eb617a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WeightedLootSystem
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponCopyManager
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
