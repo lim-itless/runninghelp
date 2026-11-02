@@ -1,115 +1,175 @@
 ﻿using System;
 
-class Program
+public abstract class Building
 {
-    public static int[] monsterDeck = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    public string Name { get; private set; }
+    public int BaseProsperity { get; private set; }
 
-    static Random random = new Random();
-
-    static void Main()
+    protected Building(string name, int baseProsperity)
     {
-        Console.WriteLine("===== 몬스터 카드 덱 매니저 =====");
-        Console.WriteLine("W : 첫 카드와 마지막 카드 교체");
-        Console.WriteLine("S : 전체 덱 섞기");
-        Console.WriteLine("SPACE : 카드 대결");
-        Console.WriteLine("ESC : 종료");
+        Name = name;
+        BaseProsperity = baseProsperity;
+    }
 
-        ShowDeck();
+    public abstract int GetDailyProsperity(Building[,] village, int row, int column);
 
-        while (true)
+    protected int CountNeighbors<T>(Building[,] village, int row, int column, bool includeDiagonals) where T : Building
+    {
+        int count = 0;
+
+        for (int rowOffset = -1; rowOffset <= 1; rowOffset++)
         {
-            Console.Write("\n행동할 키를 입력하세요 : ");
-            ConsoleKey key = Console.ReadKey(true).Key;
-            Console.WriteLine();
-
-            switch (key)
+            for (int columnOffset = -1; columnOffset <= 1; columnOffset++)
             {
-                case ConsoleKey.W:
-                    SwapFirstAndLast();
-                    break;
+                if (rowOffset == 0 && columnOffset == 0)
+                {
+                    continue;
+                }
 
-                case ConsoleKey.S:
-                    Shuffle();
-                    Console.WriteLine("덱을 섞었습니다.");
-                    ShowDeck();
-                    break;
+                if (!includeDiagonals && rowOffset != 0 && columnOffset != 0)
+                {
+                    continue;
+                }
 
-                case ConsoleKey.Spacebar:
-                    Battle();
-                    break;
+                int nextRow = row + rowOffset;
+                int nextColumn = column + columnOffset;
 
-                case ConsoleKey.Escape:
-                    Console.WriteLine("프로그램을 종료합니다.");
-                    return;
+                if (nextRow < 0 || nextRow >= village.GetLength(0) || nextColumn < 0 || nextColumn >= village.GetLength(1))
+                {
+                    continue;
+                }
 
-                default:
-                    Console.WriteLine("W, S, SPACE 또는 ESC를 눌러주세요.");
-                    break;
+                if (village[nextRow, nextColumn] is T)
+                {
+                    count++;
+                }
             }
         }
+
+        return count;
+    }
+}
+
+public class House : Building
+{
+    public House() : base("집", 10)
+    {}
+
+    public override int GetDailyProsperity(Building[,] village, int row, int column)
+    {
+        int prosperity = BaseProsperity;
+        int houseCount = CountNeighbors<House>(village, row, column, false);
+        prosperity += houseCount * 5;
+
+        int marketCount = CountNeighbors<Market>(village, row, column, false);
+
+        if (marketCount > 0)
+        {
+            prosperity += 10;
+        }
+
+        int parkCount = CountNeighbors<Park>(village, row, column, true);
+        prosperity += parkCount * 5;
+
+        return prosperity;
+    }
+}
+
+public class Market : Building
+{
+    public Market() : base("시장", 20)
+    {}
+
+    public override int GetDailyProsperity(Building[,] village, int row, int column)
+    {
+        int prosperity = BaseProsperity;
+
+        if (HasMarketNetwork(village, row, column))
+        {
+            prosperity = 35;
+        }
+
+        int houseCount = CountNeighbors<House>(village, row, column, false);
+        prosperity += houseCount * 10;
+
+        int parkCount = CountNeighbors<Park>(village, row, column, true);
+        prosperity += parkCount * 5;
+
+        return prosperity;
     }
 
-    static void ShowDeck()
+    private bool HasMarketNetwork(Building[,] village, int row, int column)
     {
-        Console.Write("현재 덱 : ");
-
-        for (int i = 0; i < monsterDeck.Length; i++)
+        for (int c = 0; c < village.GetLength(1); c++)
         {
-            Console.Write($"[{monsterDeck[i]}] ");
+            if (c != column && village[row, c] is Market)
+            {
+                return true;
+            }
         }
 
-        Console.WriteLine();
+        for (int r = 0; r < village.GetLength(0); r++)
+        {
+            if (r != row && village[r, column] is Market)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
+}
 
-    static void SwapFirstAndLast()
+public class Park : Building
+{
+    public Park() : base("공원", 0)
+    {}
+
+    public override int GetDailyProsperity(Building[,] village, int row, int column)
     {
-        int lastIndex = monsterDeck.Length - 1;
-
-        int temp = monsterDeck[0];
-        monsterDeck[0] = monsterDeck[lastIndex];
-        monsterDeck[lastIndex] = temp;
-
-        Console.WriteLine("첫 카드와 마지막 카드를 교체했습니다!");
-        ShowDeck();
+        return 0;
     }
+}
 
-    static void Shuffle()
+public class Program
+{
+    static void Main()
     {
-        for (int i = 0; i < monsterDeck.Length; i++)
+        Building[,] village = new Building[5, 5];
+
+        village[0, 0] = new House();
+        village[0, 1] = new Market();
+        village[0, 3] = new Market();
+
+        village[1, 0] = new House();
+        village[1, 1] = new Park();
+        village[1, 2] = new House();
+
+        village[2, 1] = new Market();
+        village[2, 2] = new Park();
+
+        int totalProsperity = 0;
+
+        Console.WriteLine("===== 마을 번영도 계산 =====");
+
+        for (int row = 0; row < village.GetLength(0); row++)
         {
-            int randomIndex = random.Next(0, monsterDeck.Length);
+            for (int column = 0; column < village.GetLength(1); column++)
+            {
+                Building building = village[row, column];
 
-            int temp = monsterDeck[i];
-            monsterDeck[i] = monsterDeck[randomIndex];
-            monsterDeck[randomIndex] = temp;
-        }
-    }
+                if (building == null)
+                {
+                    continue;
+                }
 
-    static void Battle()
-    {
-        int playerPower = monsterDeck[0];
-        int bossPower = random.Next(1, 11);
+                int prosperity = building.GetDailyProsperity(village, row, column);
+                totalProsperity += prosperity;
 
-        Console.WriteLine("\n===== 카드 대결 =====");
-        Console.WriteLine($"내 카드 공격력 : {playerPower}");
-        Console.WriteLine($"보스 공격력 : {bossPower}");
-
-        if (playerPower > bossPower)
-        {
-            Console.WriteLine("승리!");
-        }
-        else if (playerPower < bossPower)
-        {
-            Console.WriteLine("패배!");
-        }
-        else
-        {
-            Console.WriteLine("무승부!");
+                Console.WriteLine($"[{row}, {column}] {building.Name} → 번영도 : {prosperity}");
+            }
         }
 
-        Shuffle();
-
-        Console.WriteLine("\n대결 후 덱을 다시 섞었습니다.");
-        ShowDeck();
+        Console.WriteLine($"\n마을의 하루 총 번영도 : {totalProsperity}");
     }
 }
