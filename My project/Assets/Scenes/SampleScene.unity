@@ -423,9 +423,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 589892792}
+  - component: {fileID: 589892793}
   - component: {fileID: 589892791}
   - component: {fileID: 589892790}
-  - component: {fileID: 589892793}
   - component: {fileID: 589892789}
   m_Layer: 0
   m_Name: Cube
@@ -536,16 +536,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 589892788}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c6d1d68721487140bd87f5533cedb55, type: 3}
+  m_Script: {fileID: 11500000, guid: 35134ee927afbe04e8812c47294c5ba4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::OverheatController
-  heat: 0
-  isOverheated: 0
-  heatUpSpeed: 25
-  coolDownSpeed: 20
-  maxScaleMultiplier: 1.5
-  shakeAngle: 5
-  shakeSpeed: 25
+  m_EditorClassIdentifier: Assembly-CSharp::ColorPatternManager
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
